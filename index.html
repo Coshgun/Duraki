@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Durak Kartlarım</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #f0f0f0;
+    }
+    .card {
+      display: inline-block;
+      padding: 20px;
+      margin: 10px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+  </style>
+  <script>
+    const urlParams = new URLSearchParams(window.location.pathname);
+    const userId = window.location.pathname.split("/").pop();
+
+    async function fetchCards() {
+      const res = await fetch(`/api/cards/${userId}`);
+      const cards = await res.json();
+
+      const container = document.getElementById("cards");
+      container.innerHTML = "";
+
+      cards.forEach(card => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.textContent = card;
+        div.onclick = () => sendCard(card);
+        container.appendChild(div);
+      });
+    }
+
+    async function sendCard(card) {
+      await fetch(`/api/play`, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId, card: card })
+      });
+      alert(`Kart göndərildi: ${card}`);
+    }
+
+    window.onload = fetchCards;
+  </script>
+</head>
+<body>
+  <h1>Kartlarım</h1>
+  <div id="cards"></div>
+</body>
+</html>
